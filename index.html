@@ -1,0 +1,1189 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>酒店布草分派系統-Terryho5693</title>
+    <style>
+        :root {
+            --primary-color: #211551;
+            --secondary-color: #34a853;
+            --accent-color: #FFC107;
+            --danger-color: #ea4335;
+            --light-bg: #f8f9fa;
+            --border-color: #d1d1e0;
+            --text-on-primary: #ffffff;
+        }
+        
+        body {
+            font-family: 'Microsoft JhengHei', Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        h1 {
+            color: var(--primary-color);
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .input-section {
+            margin-bottom: 30px;
+            overflow-x: auto;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        
+        th, td {
+            padding: 12px 15px;
+            text-align: center;
+            border: 1px solid var(--border-color);
+        }
+        
+        th {
+            background-color: var(--primary-color);
+            color: white;
+            font-weight: bold;
+        }
+        
+        tr:nth-child(even) {
+            background-color: var(--light-bg);
+        }
+        
+        input[type="number"] {
+            width: 80px;
+            padding: 8px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            text-align: center;
+        }
+        
+        /* 禁用数字输入框的增减按钮 */
+        input[type="number"]::-webkit-inner-spin-button,
+        input[type="number"]::-webkit-outer-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+        
+        /* Firefox */
+        input[type="number"] {
+            -moz-appearance: textfield;
+        }
+        
+        .floor-tag {
+            display: inline-block;
+            padding: 4px 8px;
+            margin: 2px;
+            border-radius: 4px;
+            cursor: pointer;
+            background-color: #e9ecef;
+            transition: all 0.2s;
+        }
+        
+        .floor-tag.excluded {
+            background-color: #ffe3e3;
+            color: var(--danger-color);
+            text-decoration: line-through;
+        }
+        
+        .settings {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+            padding: 15px;
+            background-color: var(--light-bg);
+            border-radius: 8px;
+        }
+        
+        .setting-item {
+            display: flex;
+            align-items: center;
+        }
+        
+        .setting-item label {
+            margin-right: 10px;
+            font-weight: bold;
+            min-width: 120px;
+        }
+        
+        .setting-item input, .setting-item select {
+            flex: 1;
+            max-width: 100px;
+            padding: 8px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+        }
+        
+        .preview-section {
+            margin-top: 30px;
+        }
+        
+        .preview-container {
+            overflow-x: auto;
+            margin-top: 15px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+        }
+        
+        .preview-table {
+            min-width: 100%;
+        }
+        
+        .preview-table th {
+            position: sticky;
+            top: 0;
+        }
+        
+        .action-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
+        
+        .action-btn {
+            padding: 10px 20px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .action-btn:hover {
+            background-color: #3367d6;
+        }
+        
+        .action-btn.export {
+            background-color: var(--secondary-color);
+        }
+        
+        .action-btn.export:hover {
+            background-color: #2d9246;
+        }
+        
+        .total-ratio {
+            text-align: center;
+            font-size: 18px;
+            font-weight: bold;
+            margin: 15px 0;
+        }
+        
+        .error {
+            color: var(--danger-color);
+        }
+        
+        /* 新增独立份数模式样式 */
+        .floor-ratio-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 10px;
+            margin-bottom: 20px;
+            grid-column: 1 / -1;
+        }
+        
+        .floor-ratio-item {
+            display: flex;
+            align-items: center;
+        }
+        
+        .floor-ratio-item label {
+            min-width: 40px;
+            margin-right: 5px;
+            font-weight: bold;
+        }
+        
+        .floor-ratio-item input {
+            width: 60px;
+            padding: 5px;
+        }
+        
+        .ratio-group-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            grid-column: 1 / -1;
+        }
+        
+        .ratio-presets {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+            grid-column: 1 / -1;
+        }
+        
+        .preset-btn {
+            padding: 5px 10px;
+            background: #e0e0e0;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .preset-btn:hover {
+            background: #d0d0d0;
+        }
+        
+        @media (max-width: 768px) {
+            .settings {
+                grid-template-columns: 1fr;
+            }
+            
+            table, .preview-table {
+                font-size: 14px;
+            }
+            
+            th, td {
+                padding: 8px 10px;
+            }
+            
+            .action-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .floor-ratio-container {
+                grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>布草分派系統,Created by 4742015-HKTEHO,有挑剔既,請按右上角X滾出去自己計</h1>
+        
+        <div class="input-section">
+            <table id="inputTable">
+                <thead>
+                    <tr>
+                        <th>項目</th>
+                        <th>洗回</th>
+                        <th>翻洗</th>
+                        <th>總數</th>
+                        <th>2F</th>
+                        <th>貧窮樓層</th>
+                    </tr>
+                </thead>
+                <tbody id="itemRows">
+                    <!-- 項目行將由JavaScript動態生成 -->
+                </tbody>
+            </table>
+        </div>
+        
+        <div class="settings">
+            <div class="setting-item">
+                <label for="baseRatio">設定總基準份數：</label>
+                <input type="number" id="baseRatio" min="0" step="1" value="27">
+            </div>
+            
+            <div class="setting-item">
+                <label for="ratioMode">比例模式：</label>
+                <select id="ratioMode">
+                    <option value="group">分組模式</option>
+                    <option value="individual">獨立模式</option>
+                </select>
+            </div>
+            
+            <!-- 分組比例設置 -->
+            <div id="groupRatios" class="ratio-group-container">
+                <div class="setting-item">
+                    <label for="f5Ratio">5F 份數：</label>
+                    <input type="number" id="f5Ratio" min="0" step="0.1" value="1.0">
+                </div>
+                <div class="setting-item">
+                    <label for="f6_15Ratio">6F–15F 份數：</label>
+                    <input type="number" id="f6_15Ratio" min="0" step="0.1" value="1.5">
+                </div>
+                <div class="setting-item">
+                    <label for="f16_26Ratio">16F–26F 份數：</label>
+                    <input type="number" id="f16_26Ratio" min="0" step="0.1" value="1.0">
+                </div>
+            </div>
+            
+            <!-- 獨立樓層比例設置 -->
+            <div id="individualRatios" class="floor-ratio-container" style="display:none;">
+                <!-- 樓層比例輸入將由JavaScript動態生成 -->
+            </div>
+            
+            <!-- 比例預設按鈕 -->
+            <div class="ratio-presets">
+                <button class="preset-btn" data-preset="default">默認比例</button>
+                <button class="preset-btn" data-preset="uniform">統一比例</button>
+                <button class="preset-btn" data-preset="high-middle">中高樓層加重</button>
+            </div>
+        </div>
+        
+        <div class="total-ratio" id="totalRatio">分派總份數：0.0</div>
+        
+        <div class="action-buttons">
+            <button class="action-btn export" id="exportExcel">
+                <span>📊</span> 導出Excel
+            </button>
+        </div>
+        
+        <div class="preview-section">
+            <h2>即時派彩</h2>
+            <div class="preview-container">
+                <table class="preview-table" id="previewTable">
+                    <thead>
+                        <tr id="previewHeader">
+                            <!-- 預覽表頭將由JavaScript動態生成 -->
+                        </tr>
+                    </thead>
+                    <tbody id="previewBody">
+                        <!-- 預覽內容將由JavaScript動態生成 -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 常量定義
+        const ITEMS = ["大床單", "細床單", "大被袋", "細被袋", "枕頭袋", "大毛巾", "中毛巾", "地巾", "浴袍"];
+        const FLOORS = ["2F"].concat(Array.from({length: 22}, (_, i) => `${i+5}F`));
+        
+        // 應用狀態
+        const state = {
+            items: {},
+            floorRatios: {}, // 存儲每個樓層的獨立比例
+            excludedFloors: {},
+            ratioMode: "group" // 'group' 或 'individual'
+        };
+        
+        // 初始化應用
+        function initApp() {
+            // 初始化狀態
+            ITEMS.forEach(item => {
+                state.items[item] = {
+                    washed: 0,
+                    rewashed: 0,
+                    manual: 0,
+                    total: 0
+                };
+                
+                state.excludedFloors[item] = {};
+                FLOORS.forEach(floor => {
+                    if (floor !== "2F") {
+                        state.excludedFloors[item][floor] = false;
+                    }
+                });
+            });
+            
+            // 初始化樓層比例
+            initFloorRatios();
+            
+            // 渲染輸入表格
+            renderInputTable();
+            
+            // 渲染預覽表格
+            renderPreviewTable();
+            
+            // 綁定事件
+            bindEvents();
+            
+            // 初始計算
+            updateTotalRatio();
+            updatePreview();
+        }
+        
+        // 初始化樓層比例
+        function initFloorRatios() {
+            FLOORS.forEach(floor => {
+                if (floor === "2F") return;
+                
+                const floorNum = parseInt(floor);
+                // 設置默認值
+                if (floorNum === 5) state.floorRatios[floor] = 1.0;
+                else if (floorNum >= 6 && floorNum <= 15) state.floorRatios[floor] = 1.5;
+                else if (floorNum >= 16 && floorNum <= 26) state.floorRatios[floor] = 1.0;
+            });
+            
+            renderFloorRatioInputs();
+        }
+        
+        // 渲染樓層比例輸入
+        function renderFloorRatioInputs() {
+            const container = document.getElementById("individualRatios");
+            container.innerHTML = "";
+            
+            Object.keys(state.floorRatios).sort((a, b) => parseInt(a) - parseInt(b)).forEach(floor => {
+                const item = document.createElement("div");
+                item.className = "floor-ratio-item";
+                
+                const label = document.createElement("label");
+                label.textContent = floor;
+                item.appendChild(label);
+                
+                const input = document.createElement("input");
+                input.type = "number";
+                input.min = "0";
+                input.step = "0.1";
+                input.value = state.floorRatios[floor];
+                input.dataset.floor = floor;
+                item.appendChild(input);
+                
+                container.appendChild(item);
+            });
+        }
+        
+        // 渲染輸入表格
+        function renderInputTable() {
+            const tbody = document.getElementById("itemRows");
+            tbody.innerHTML = "";
+            
+            ITEMS.forEach((item, index) => {
+                const row = document.createElement("tr");
+                
+                // 項目名稱
+                const nameCell = document.createElement("td");
+                nameCell.textContent = item;
+                row.appendChild(nameCell);
+                
+                // 洗回輸入
+                const washedCell = document.createElement("td");
+                const washedInput = document.createElement("input");
+                washedInput.type = "number";
+                washedInput.min = "0";
+                washedInput.value = "0";
+                washedInput.dataset.item = item;
+                washedInput.dataset.type = "washed";
+                washedInput.dataset.row = index;
+                washedInput.dataset.col = 0;
+                washedCell.appendChild(washedInput);
+                row.appendChild(washedCell);
+                
+                // 翻洗輸入
+                const rewashedCell = document.createElement("td");
+                const rewashedInput = document.createElement("input");
+                rewashedInput.type = "number";
+                rewashedInput.min = "0";
+                rewashedInput.value = "0";
+                rewashedInput.dataset.item = item;
+                rewashedInput.dataset.type = "rewashed";
+                rewashedInput.dataset.row = index;
+                rewashedInput.dataset.col = 1;
+                rewashedCell.appendChild(rewashedInput);
+                row.appendChild(rewashedCell);
+                
+                // 總數
+                const totalCell = document.createElement("td");
+                totalCell.textContent = "0";
+                totalCell.dataset.item = item;
+                totalCell.dataset.type = "total";
+                row.appendChild(totalCell);
+                
+                // 2F
+                const manualCell = document.createElement("td");
+                const manualInput = document.createElement("input");
+                manualInput.type = "number";
+                manualInput.min = "0";
+                manualInput.value = "0";
+                manualInput.dataset.item = item;
+                manualInput.dataset.type = "manual";
+                manualInput.dataset.row = index;
+                manualInput.dataset.col = 2;
+                manualCell.appendChild(manualInput);
+                row.appendChild(manualCell);
+                
+                // 排除樓層
+                const excludeCell = document.createElement("td");
+                excludeCell.className = "exclude-floors";
+                FLOORS.forEach(floor => {
+                    if (floor === "2F") return;
+                    
+                    const floorTag = document.createElement("span");
+                    floorTag.className = "floor-tag";
+                    floorTag.textContent = floor;
+                    floorTag.dataset.item = item;
+                    floorTag.dataset.floor = floor;
+                    excludeCell.appendChild(floorTag);
+                });
+                row.appendChild(excludeCell);
+                
+                tbody.appendChild(row);
+            });
+        }
+        
+        // 渲染預覽表格
+        function renderPreviewTable() {
+            const headerRow = document.getElementById("previewHeader");
+            headerRow.innerHTML = "";
+            
+            // 添加表頭
+            const itemHeader = document.createElement("th");
+            itemHeader.textContent = "項目";
+            headerRow.appendChild(itemHeader);
+            
+            FLOORS.forEach(floor => {
+                const th = document.createElement("th");
+                th.textContent = floor;
+                headerRow.appendChild(th);
+            });
+            
+            const totalHeader = document.createElement("th");
+            totalHeader.textContent = "總數";
+            headerRow.appendChild(totalHeader);
+            
+            // 添加項目行
+            const tbody = document.getElementById("previewBody");
+            tbody.innerHTML = "";
+            
+            ITEMS.forEach(item => {
+                const row = document.createElement("tr");
+                
+                // 項目名稱
+                const nameCell = document.createElement("td");
+                nameCell.textContent = item;
+                row.appendChild(nameCell);
+                
+                // 樓層數據
+                FLOORS.forEach(floor => {
+                    const td = document.createElement("td");
+                    td.textContent = "0";
+                    td.dataset.item = item;
+                    td.dataset.floor = floor;
+                    row.appendChild(td);
+                });
+                
+                // 總數
+                const totalCell = document.createElement("td");
+                totalCell.textContent = "0";
+                totalCell.dataset.item = item;
+                totalCell.dataset.type = "preview-total";
+                row.appendChild(totalCell);
+                
+                tbody.appendChild(row);
+            });
+        }
+        
+        // 綁定事件
+        function bindEvents() {
+            // 數字輸入框變化
+            document.querySelectorAll("input[type='number']").forEach(input => {
+                input.addEventListener("change", handleInputChange);
+                input.addEventListener("input", handleInputChange);
+                // 添加Enter鍵事件監聽
+                input.addEventListener("keydown", handleKeyDown);
+                // 阻止鼠标滚轮改变数字输入框的值
+                input.addEventListener("wheel", function(e) {
+                    e.preventDefault();
+                });
+            });
+            
+            // 樓層標籤點擊
+            document.querySelectorAll(".floor-tag").forEach(tag => {
+                tag.addEventListener("click", toggleExcludeFloor);
+            });
+            
+            // Excel導出按鈕
+            document.getElementById("exportExcel").addEventListener("click", exportToExcel);
+            
+            // 基準份數變化
+            document.getElementById("baseRatio").addEventListener("change", updateBaseRatio);
+            
+            // 比例模式切換
+            document.getElementById("ratioMode").addEventListener("change", toggleRatioMode);
+            
+            // 分組比例變化
+            document.getElementById("f5Ratio").addEventListener("change", handleGroupRatioChange);
+            document.getElementById("f6_15Ratio").addEventListener("change", handleGroupRatioChange);
+            document.getElementById("f16_26Ratio").addEventListener("change", handleGroupRatioChange);
+            
+            // 獨立比例變化
+            document.addEventListener("change", function(e) {
+                if (e.target.matches("#individualRatios input[type='number']")) {
+                    updateFloorRatio(e);
+                }
+            });
+            
+            document.addEventListener("input", function(e) {
+                if (e.target.matches("#individualRatios input[type='number']")) {
+                    updateFloorRatio(e);
+                }
+            });
+            
+            // 比例預設按鈕
+            document.querySelectorAll(".preset-btn").forEach(btn => {
+                btn.addEventListener("click", applyRatioPreset);
+            });
+        }
+        
+        // 處理鍵盤事件（Enter鍵跳轉） - 已修改为按项目顺序跳转
+        function handleKeyDown(e) {
+            if (e.key === "Enter") {
+                e.preventDefault();
+                const currentInput = e.target;
+                const currentRow = parseInt(currentInput.dataset.row);
+                const currentCol = parseInt(currentInput.dataset.col);
+                
+                // 獲取所有輸入框
+                const inputs = document.querySelectorAll("#itemRows input[type='number']");
+                
+                // 計算下一個輸入框的索引（下一行的同一列）
+                let nextIndex = -1;
+                
+                // 如果還有下一行，跳轉到下一行的同一列
+                if (currentRow < ITEMS.length - 1) {
+                    nextIndex = (currentRow + 1) * 3 + currentCol;
+                }
+                
+                // 如果找到下一個輸入框，聚焦它
+                if (nextIndex >= 0 && nextIndex < inputs.length) {
+                    inputs[nextIndex].focus();
+                    inputs[nextIndex].select();
+                }
+            }
+        }
+        
+        // 處理輸入變化
+        function handleInputChange(e) {
+            const input = e.target;
+            const item = input.dataset.item;
+            const type = input.dataset.type;
+            const value = parseInt(input.value) || 0;
+            
+            // 更新狀態
+            state.items[item][type] = value;
+            
+            // 如果是洗回或翻洗，更新總數
+            if (type === "washed" || type === "rewashed") {
+                updateItemTotal(item);
+            }
+            
+            // 更新預覽
+            updatePreview();
+        }
+        
+        // 更新項目總數
+        function updateItemTotal(item) {
+            const total = state.items[item].washed + state.items[item].rewashed;
+            state.items[item].total = total;
+            
+            // 更新UI
+            document.querySelector(`td[data-item="${item}"][data-type="total"]`).textContent = total;
+        }
+        
+        // 切換排除樓層
+        function toggleExcludeFloor(e) {
+            const tag = e.target;
+            const item = tag.dataset.item;
+            const floor = tag.dataset.floor;
+            
+            // 更新狀態
+            state.excludedFloors[item][floor] = !state.excludedFloors[item][floor];
+            
+            // 更新UI
+            tag.classList.toggle("excluded", state.excludedFloors[item][floor]);
+            
+            // 更新預覽
+            updatePreview();
+        }
+        
+        // 更新基準份數
+        function updateBaseRatio() {
+            const baseRatio = parseInt(document.getElementById("baseRatio").value) || 0;
+            updateTotalRatio();
+            updatePreview();
+        }
+        
+        // 切換比例模式
+        function toggleRatioMode() {
+            const mode = document.getElementById("ratioMode").value;
+            state.ratioMode = mode;
+            
+            if (mode === "group") {
+                document.getElementById("groupRatios").style.display = "grid";
+                document.getElementById("individualRatios").style.display = "none";
+                syncGroupToIndividual();
+            } else {
+                document.getElementById("groupRatios").style.display = "none";
+                document.getElementById("individualRatios").style.display = "grid";
+                syncIndividualToGroup();
+            }
+            
+            updateTotalRatio();
+            updatePreview();
+        }
+        
+        // 分組比例同步到獨立比例
+        function syncGroupToIndividual() {
+            const f5Ratio = parseFloat(document.getElementById("f5Ratio").value) || 0;
+            const f6_15Ratio = parseFloat(document.getElementById("f6_15Ratio").value) || 0;
+            const f16_26Ratio = parseFloat(document.getElementById("f16_26Ratio").value) || 0;
+            
+            Object.keys(state.floorRatios).forEach(floor => {
+                const floorNum = parseInt(floor);
+                if (floorNum === 5) {
+                    state.floorRatios[floor] = f5Ratio;
+                } else if (floorNum >= 6 && floorNum <= 15) {
+                    state.floorRatios[floor] = f6_15Ratio;
+                } else if (floorNum >= 16 && floorNum <= 26) {
+                    state.floorRatios[floor] = f16_26Ratio;
+                }
+            });
+            
+            renderFloorRatioInputs();
+        }
+        
+        // 獨立比例同步到分組比例
+        function syncIndividualToGroup() {
+            let f5Ratio = 0, f6_15Ratio = 0, f16_26Ratio = 0;
+            let f5Count = 0, f6_15Count = 0, f16_26Count = 0;
+            
+            Object.keys(state.floorRatios).forEach(floor => {
+                const floorNum = parseInt(floor);
+                if (floorNum === 5) {
+                    f5Ratio += state.floorRatios[floor];
+                    f5Count++;
+                } else if (floorNum >= 6 && floorNum <= 15) {
+                    f6_15Ratio += state.floorRatios[floor];
+                    f6_15Count++;
+                } else if (floorNum >= 16 && floorNum <= 26) {
+                    f16_26Ratio += state.floorRatios[floor];
+                    f16_26Count++;
+                }
+            });
+            
+            // 計算平均值
+            document.getElementById("f5Ratio").value = f5Count > 0 ? (f5Ratio / f5Count).toFixed(1) : "0";
+            document.getElementById("f6_15Ratio").value = f6_15Count > 0 ? (f6_15Ratio / f6_15Count).toFixed(1) : "0";
+            document.getElementById("f16_26Ratio").value = f16_26Count > 0 ? (f16_26Ratio / f16_26Count).toFixed(1) : "0";
+        }
+        
+        // 分組比例變化處理
+        function handleGroupRatioChange() {
+            if (state.ratioMode === "group") {
+                syncGroupToIndividual();
+                updateTotalRatio();
+                updatePreview();
+            }
+        }
+        
+        // 更新樓層比例
+        function updateFloorRatio(e) {
+            const input = e.target;
+            const floor = input.dataset.floor;
+            state.floorRatios[floor] = parseFloat(input.value) || 0;
+            updateTotalRatio();
+            updatePreview();
+        }
+        
+        // 應用比例預設
+        function applyRatioPreset(e) {
+            const preset = e.target.dataset.preset;
+            
+            if (state.ratioMode === "group") {
+                // 分組模式應用預設
+                switch(preset) {
+                    case "default":
+                        document.getElementById("f5Ratio").value = "1.0";
+                        document.getElementById("f6_15Ratio").value = "1.5";
+                        document.getElementById("f16_26Ratio").value = "1.0";
+                        break;
+                        
+                    case "uniform":
+                        document.getElementById("f5Ratio").value = "1.0";
+                        document.getElementById("f6_15Ratio").value = "1.0";
+                        document.getElementById("f16_26Ratio").value = "1.0";
+                        break;
+                        
+                    case "high-middle":
+                        document.getElementById("f5Ratio").value = "1.0";
+                        document.getElementById("f6_15Ratio").value = "1.8";
+                        document.getElementById("f16_26Ratio").value = "1.2";
+                        break;
+                }
+                handleGroupRatioChange();
+            } else {
+                // 獨立模式應用預設
+                switch(preset) {
+                    case "default":
+                        updateAllFloorRatios(floor => {
+                            const num = parseInt(floor);
+                            if (num === 5) return 1.0;
+                            if (num >= 6 && num <= 15) return 1.5;
+                            return 1.0;
+                        });
+                        break;
+                        
+                    case "uniform":
+                        updateAllFloorRatios(() => 1.0);
+                        break;
+                        
+                    case "high-middle":
+                        updateAllFloorRatios(floor => {
+                            const num = parseInt(floor);
+                            if (num === 5) return 1.0;
+                            if (num >= 6 && num <= 15) return 1.8;
+                            return 1.2;
+                        });
+                        break;
+                }
+            }
+        }
+        
+        // 更新所有樓層比例
+        function updateAllFloorRatios(getRatio) {
+            Object.keys(state.floorRatios).forEach(floor => {
+                const ratio = getRatio(floor);
+                state.floorRatios[floor] = ratio;
+                
+                // 更新UI
+                const input = document.querySelector(`#individualRatios input[data-floor="${floor}"]`);
+                if (input) input.value = ratio;
+            });
+            
+            updateTotalRatio();
+            updatePreview();
+        }
+        
+        // 更新總份數顯示
+        function updateTotalRatio() {
+            let totalRatio = 0;
+            
+            if (state.ratioMode === "group") {
+                const f5Ratio = parseFloat(document.getElementById("f5Ratio").value) || 0;
+                const f6_15Ratio = parseFloat(document.getElementById("f6_15Ratio").value) || 0;
+                const f16_26Ratio = parseFloat(document.getElementById("f16_26Ratio").value) || 0;
+                
+                // 計算總份數 (5F有1個樓層，6-15F有10個樓層，16-26F有11個樓層)
+                totalRatio = f5Ratio + (f6_15Ratio * 10) + (f16_26Ratio * 11);
+            } else {
+                // 獨立模式計算總份數
+                totalRatio = Object.values(state.floorRatios).reduce((sum, ratio) => sum + ratio, 0);
+            }
+            
+            document.getElementById("totalRatio").textContent = `分派總份數：${totalRatio.toFixed(1)}`;
+        }
+        
+        // 更新預覽
+        function updatePreview() {
+            ITEMS.forEach(item => {
+                const itemData = state.items[item];
+                const total = itemData.total;
+                const manualQty = itemData.manual;
+                const remaining = Math.max(0, total - manualQty);
+                
+                // 計算各樓層比例
+                const floorRatios = {};
+                FLOORS.forEach(floor => {
+                    if (floor === "2F") return;
+                    if (state.excludedFloors[item][floor]) return;
+                    
+                    if (state.ratioMode === "group") {
+                        // 分組模式使用分組比例
+                        const floorNum = parseInt(floor);
+                        if (floorNum === 5) {
+                            floorRatios[floor] = parseFloat(document.getElementById("f5Ratio").value) || 0;
+                        } else if (floorNum >= 6 && floorNum <= 15) {
+                            floorRatios[floor] = parseFloat(document.getElementById("f6_15Ratio").value) || 0;
+                        } else if (floorNum >= 16 && floorNum <= 26) {
+                            floorRatios[floor] = parseFloat(document.getElementById("f16_26Ratio").value) || 0;
+                        }
+                    } else {
+                        // 獨立模式使用獨立比例
+                        floorRatios[floor] = state.floorRatios[floor] || 0;
+                    }
+                });
+                
+                const totalRatio = Object.values(floorRatios).reduce((sum, r) => sum + r, 0);
+                
+                // 分配數量
+                const assigned = {};
+                let rowTotal = manualQty;
+                
+                if (totalRatio > 0 && remaining > 0) {
+                    // 基礎分配
+                    Object.keys(floorRatios).forEach(floor => {
+                        assigned[floor] = Math.floor(remaining * floorRatios[floor] / totalRatio);
+                    });
+                    
+                    // 處理餘數
+                    const remainder = remaining - Object.values(assigned).reduce((sum, qty) => sum + qty, 0);
+                    const sortedFloors = Object.keys(floorRatios).sort((a, b) => floorRatios[b] - floorRatios[a]);
+                    
+                    for (let i = 0; i < remainder; i++) {
+                        const floor = sortedFloors[i % sortedFloors.length];
+                        assigned[floor] = (assigned[floor] || 0) + 1;
+                    }
+                    
+                    rowTotal += Object.values(assigned).reduce((sum, qty) => sum + qty, 0);
+                }
+                
+                // 更新預覽UI
+                FLOORS.forEach(floor => {
+                    const cell = document.querySelector(`td[data-item="${item}"][data-floor="${floor}"]`);
+                    
+                    if (floor === "2F") {
+                        cell.textContent = manualQty;
+                        cell.className = "";
+                    } else if (state.excludedFloors[item][floor]) {
+                        cell.textContent = "⛔";
+                        cell.className = "error";
+                    } else {
+                        cell.textContent = assigned[floor] || "0";
+                        cell.className = "";
+                    }
+                });
+                
+                // 更新總數
+                document.querySelector(`td[data-item="${item}"][data-type="preview-total"]`).textContent = rowTotal;
+            });
+        }
+        
+        // Excel導出功能
+        function exportToExcel() {
+            // 創建工作簿HTML
+            let html = `
+            <html xmlns:o="urn:schemas-microsoft-com:office:office" 
+                  xmlns:x="urn:schemas-microsoft-com:office:excel" 
+                  xmlns="http://www.w3.org/TR/REC-html40">
+            <head>
+                <meta charset="UTF-8">
+                <!--[if gte mso 9]>
+                <xml>
+                    <x:ExcelWorkbook>
+                        <x:ExcelWorksheets>
+                            <x:ExcelWorksheet>
+                                <x:Name>布草分派數據</x:Name>
+                                <x:WorksheetOptions>
+                                    <x:DisplayGridlines/>
+                                    <x:PageSetup>
+                                        <x:Layout x:Orientation="Landscape"/>
+                                        <x:FitToPage/>
+                                        <x:FitWidth>1</x:FitWidth>
+                                        <x:FitHeight>32767</x:FitHeight>
+                                        <x:Print>
+                                            <x:ValidPrinterInfo/>
+                                            <x:PaperSizeIndex>9</x:PaperSizeIndex>
+                                            <x:HorizontalResolution>600</x:HorizontalResolution>
+                                            <x:VerticalResolution>600</x:VerticalResolution>
+                                        </x:Print>
+                                    </x:PageSetup>
+                                </x:WorksheetOptions>
+                            </x:ExcelWorksheet>
+                        </x:ExcelWorksheets>
+                    </x:ExcelWorkbook>
+                </xml>
+                <![endif]-->
+                <style>
+                    @media print {
+                        @page {
+                            size: A4 landscape !important;
+                            margin: 1cm !important;
+                        }
+                        body {
+                            transform: scale(0.95);
+                            transform-origin: 0 0;
+                        }
+                    }
+                    table {
+                        border-collapse: collapse;
+                        width: 2400px;
+                        table-layout: fixed;
+                        page-break-inside: avoid !important;
+                    }
+                    th, td {
+                        border: 1px solid black;
+                        padding: 4px 8px !important;
+                        word-wrap: break-word;
+                    }
+                    th {
+                        background-color: #4CAF50;
+                        color: white;
+                        font-weight: bold;
+                    }
+                    .total {
+                        background-color: #E0F7FA;
+                        font-weight: bold;
+                    }
+                    .excluded {
+                        color: #FF0000;
+                        text-decoration: line-through;
+                    }
+                </style>
+            </head>
+            <body>
+                <div style="font-size:14pt;font-weight:bold;text-align:center;margin-bottom:10px;">
+                    酒店布草分派數據
+                </div>
+                <div style="font-size:10pt;text-align:center;margin-bottom:15px;">
+                    生成時間: ${new Date().toLocaleString()}
+                </div>
+                
+                <table>
+                    <colgroup>
+                        <col width="120">
+                        ${FLOORS.map(() => `<col width="70">`).join('')}
+                        <col width="80">
+                        <col width="80">
+                        <col width="100">
+                    </colgroup>
+                    <tr>
+                        <th>項目</th>
+                        ${FLOORS.map(floor => `<th>${floor}</th>`).join('')}
+                        <th>送回</th>
+                        <th>翻洗</th>
+                        <th>總數</th>
+                        <th>差異（-x）</th>
+                    </tr>
+                    ${ITEMS.map(item => {
+                        const itemData = state.items[item];
+                        const total = itemData.total;
+                        const manualQty = itemData.manual;
+                        const remaining = Math.max(0, total - manualQty);
+                        
+                        const floorRatios = {};
+                        FLOORS.forEach(floor => {
+                            if (floor === "2F") return;
+                            if (state.excludedFloors[item][floor]) return;
+                            
+                            floorRatios[floor] = state.floorRatios[floor] || 0;
+                        });
+                        
+                        const totalRatio = Object.values(floorRatios).reduce((sum, r) => sum + r, 0);
+                        const assigned = {};
+                        let rowTotal = manualQty;
+                        
+                        if (totalRatio > 0 && remaining > 0) {
+                            Object.keys(floorRatios).forEach(floor => {
+                                assigned[floor] = Math.floor(remaining * floorRatios[floor] / totalRatio);
+                            });
+                            
+                            const remainder = remaining - Object.values(assigned).reduce((sum, qty) => sum + qty, 0);
+                            const sortedFloors = Object.keys(floorRatios).sort((a, b) => floorRatios[b] - floorRatios[a]);
+                            
+                            for (let i = 0; i < remainder; i++) {
+                                const floor = sortedFloors[i % sortedFloors.length];
+                                assigned[floor] = (assigned[floor] || 0) + 1;
+                            }
+                            
+                            rowTotal += Object.values(assigned).reduce((sum, qty) => sum + qty, 0);
+                        }
+                        
+                        // 計算欄位值
+                        const sentBack = itemData.washed;
+                        const rewashed = itemData.rewashed;
+                        const totalQuantity = sentBack + rewashed;
+                        const difference = total - rowTotal;
+                        
+                        return `
+                        <tr style="height:20px">
+                            <td>${item}</td>
+                            ${FLOORS.map(floor => {
+                                if (floor === "2F") {
+                                    return `<td>${manualQty}</td>`;
+                                } else if (state.excludedFloors[item][floor]) {
+                                    return `<td class="excluded">0</td>`;
+                                } else {
+                                    return `<td>${assigned[floor] || 0}</td>`;
+                                }
+                            }).join('')}
+                            <td>${sentBack}</td>
+                            <td>${rewashed}</td>
+                            <td class="total">${totalQuantity}</td>
+                            <td>${difference < 0 ? difference : ''}</td>
+                        </tr>
+                        `;
+                    }).join('')}
+                </table>
+                
+                <br>
+                
+                <table style="width: auto; margin-left: auto; margin-right: auto;">
+                    <tr>
+                        <th colspan="2" style="text-align: center;">系統設置</th>
+                    </tr>
+                    <tr>
+                        <td>總基準份數</td>
+                        <td>${document.getElementById('baseRatio').value}</td>
+                    </tr>
+                    <tr>
+                        <td>比例模式</td>
+                        <td>${state.ratioMode === 'group' ? '分組模式' : '獨立模式'}</td>
+                    </tr>
+                    <tr>
+                        <td>分派總份數</td>
+                        <td>${document.getElementById('totalRatio').textContent.split('：')[1]}</td>
+                    </tr>
+                </table>
+                
+                <br>
+                
+                ${state.ratioMode === 'group' ? `
+                <table style="width: auto; margin-left: auto; margin-right: auto;">
+                    <tr>
+                        <th>分組</th>
+                        <th>分配比例</th>
+                    </tr>
+                    <tr>
+                        <td>5F</td>
+                        <td>${document.getElementById('f5Ratio').value}</td>
+                    </tr>
+                    <tr>
+                        <td>6F-15F</td>
+                        <td>${document.getElementById('f6_15Ratio').value}</td>
+                    </tr>
+                    <tr>
+                        <td>16F-26F</td>
+                        <td>${document.getElementById('f16_26Ratio').value}</td>
+                    </tr>
+                </table>
+                ` : `
+                <table style="width: auto; margin-left: auto; margin-right: auto;">
+                    <tr>
+                        <th>樓層</th>
+                        <th>分配比例</th>
+                    </tr>
+                    ${Object.keys(state.floorRatios).sort((a, b) => parseInt(a) - parseInt(b)).map(floor => `
+                    <tr>
+                        <td>${floor}</td>
+                        <td>${state.floorRatios[floor]}</td>
+                    </tr>
+                    `).join('')}
+                </table>
+                `}
+            </body>
+            </html>
+            `;
+            
+            // 創建Blob對象
+            const blob = new Blob([html], {type: 'application/vnd.ms-excel'});
+            
+            // 創建下載鏈接
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = `布草分派_${new Date().toISOString().slice(0,10)}.xls`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        }
+        
+        // 初始化應用
+        window.onload = initApp;
+    </script>
+</body>
+</html>
